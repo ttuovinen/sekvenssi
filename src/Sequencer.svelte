@@ -1,5 +1,5 @@
 <script>
-  import { MODE, MIDI_NOTES } from "./constants";
+  import { MODE, NOTE_LENGTHS, MIDI_NOTES } from "./constants";
   import Step from "./step";
 
   const modeOptions = Object.values(MODE);
@@ -15,13 +15,13 @@
   let bpm = 120; // bpm
   let gate = 80; // % of speed
   let base = 40; // E2
+  let noteLength = 8; // 1/noteLength
   let importString = "";
 
-  $: speed = Math.round(60000 / bpm) / 2;
+  $: speed = (Math.round(60000 / bpm) / noteLength) * 4;
 
   const refreshStepState = () => {
     stepState = steps.map(({ index, notes, mode }) => ({ index, notes, mode }));
-    console.log(bpm, speed);
   };
 
   const initialize = async () => {
@@ -131,20 +131,42 @@
 </script>
 
 <!-- Controls  -->
-<label class="control-slider"
+<label class="control-item"
   >Speed
   <input
-    type="range"
-    value={bpm}
+    class="control-input"
+    type="number"
+    bind:value={bpm}
     min="30"
     max="320"
-    on:change={(e) => (bpm = e.target.value)}
   />
-  {bpm} bpm
+  bpm
 </label>
-<label class="control-slider"
+<label class="control-item">
+  Base note
+  <input
+    class="control-input"
+    type="number"
+    bind:value={base}
+    min="24"
+    max="100"
+  />
+  {MIDI_NOTES[base]}
+</label>
+<label class="control-item">
+  Note length: 1 /
+  <select class="control-input" bind:value={noteLength}>
+    {#each NOTE_LENGTHS as option}
+      <option value={option}>
+        {option}
+      </option>
+    {/each}
+  </select>
+</label>
+<label class="control-item"
   >Gate
   <input
+    class="control-input"
     type="range"
     value={gate}
     min="1"
@@ -153,11 +175,6 @@
   />
   {gate} %
 </label>
-<div class="control-slider">
-  Base note
-  <input class="base" type="number" bind:value={base} min="24" max="100" />
-  {MIDI_NOTES[base]}
-</div>
 <button on:click={play}>PLAY</button>
 <button on:click={stop}>STOP</button>
 <button on:click={clearAll}>CLEAR</button>
@@ -213,13 +230,13 @@
 
 <!-- Steps  -->
 <style>
-  .control-slider {
+  .control-item {
     margin-bottom: 8px;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .control-slider input {
+  .control-input {
     margin: 0 16px;
   }
   .step--active .step__label {

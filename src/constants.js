@@ -9,20 +9,9 @@ export const MODE = {
   SKIP: "SKIP",
 };
 
-const NOTES = [
-  "C",
-  "C#",
-  "D",
-  "D#",
-  "E",
-  "F",
-  "F#",
-  "G",
-  "G#",
-  "A",
-  "A#",
-  "B",
-];
+export const NOTE_LENGTHS = [1, 2, 3, 4, 6, 8, 16, 24, 32];
+
+const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 
 export const MIDI_NOTES = [...new Array(128)].map((_, idx) => {
   const note = NOTES[(idx + NOTES.length) % NOTES.length];
