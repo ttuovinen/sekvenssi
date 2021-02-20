@@ -154,11 +154,11 @@
   {MIDI_NOTES[base]}
 </label>
 <label class="control-item">
-  Note length: 1 /
+  Note length:
   <select class="control-input" bind:value={noteLength}>
     {#each NOTE_LENGTHS as option}
       <option value={option}>
-        {option}
+        1 / {option}
       </option>
     {/each}
   </select>
@@ -211,7 +211,9 @@
             max="24"
             on:change={(e) => step.setNote(nIdx, e.target.value)}
           />
-          <button on:click={() => handleDeleteNote(step, nIdx)}>x</button>
+          {#if step.mode !== MODE.MIMIC}
+            <button on:click={() => handleDeleteNote(step, nIdx)}>x</button>
+          {/if}
         </div>
       {/each}
       <button on:click={() => handleAddNote(step)}>+</button>
