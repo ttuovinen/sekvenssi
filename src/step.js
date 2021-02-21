@@ -14,6 +14,7 @@ function Step(
   this.notes = notes;
   this.mode = mode;
   this.current = null;
+  this.queued = null;
   this.index = -1;
   this.modeSpecific = modeSpecific;
 
@@ -27,6 +28,10 @@ function Step(
     this.notes[idx] = note === "" ? null : parseInt(note, 10);
   };
 
+  this.queueNote = (idx) => {
+    this.queued = idx;
+  };
+
   this.addNote = () => {
     this.notes.push(0);
   };
@@ -36,8 +41,15 @@ function Step(
   };
 
   this.next = () => {
-    const len = this.notes.length;
 
+    if (this.queued !== null) {
+      this.index = this.queued;
+      this.current = this.notes[this.index];
+      this.queued = null;
+      return this.current;
+    }
+  
+    const len = this.notes.length;
     switch (this.mode) {
       case MODE.DOWN:
         this.index = (this.index + 1 + len) % len;

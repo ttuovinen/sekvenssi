@@ -26,7 +26,12 @@
     settings.denominator;
 
   const refreshStepState = () => {
-    stepState = steps.map(({ index, notes, mode }) => ({ index, notes, mode }));
+    stepState = steps.map(({ index, notes, mode, queued }) => ({
+      index,
+      notes,
+      mode,
+      queued,
+    }));
   };
 
   const initialize = async () => {
@@ -53,6 +58,11 @@
 
   const handleDeleteNote = (step, nIdx) => {
     step.deleteNote(nIdx);
+    refreshStepState();
+  };
+
+  const handleQueueNote = (step, nIdx) => {
+    step.queueNote(nIdx);
     refreshStepState();
   };
 
@@ -132,9 +142,7 @@
       stop();
       const input = JSON.parse(importString);
       settings = input.settings;
-      steps = input.steps.map(
-        (item) => new Step(...item)
-      );
+      steps = input.steps.map((item) => new Step(...item));
       refreshStepState();
     } catch (err) {
       console.log(err);
@@ -222,7 +230,15 @@
         {/each}
       </select>
       {#each stepState[step.mode === MODE.MIMIC ? 0 : idx].notes || [] as _, nIdx}
-        <div>
+        <div class="note-wrapper">
+          {#if step.mode !== MODE.MIMIC}
+            <button
+              class="queue-note"
+              class:queue-note--active={stepState[idx].queued === nIdx}
+              on:click={() => handleQueueNote(step, nIdx)}
+              aria-label="queue note"
+            />
+          {/if}
           <input
             class="note"
             class:note--active={stepState[step.mode === MODE.MIMIC ? 0 : idx]
@@ -293,6 +309,20 @@
   }
   .step {
     margin: 8px;
+  }
+  .note-wrapper {
+    display: flex;
+    align-items: center;
+  }
+  .queue-note {
+    background: none;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    margin-right: 6px;
+  }
+  .queue-note--active {
+    background: orange;
   }
   .step--skip .note {
     background: #333;
