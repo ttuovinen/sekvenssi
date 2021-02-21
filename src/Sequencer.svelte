@@ -113,11 +113,11 @@
   const exportAll = () => {
     try {
       const output = JSON.stringify({
-        steps: stepState.map(({ notes, mode, modeSpecific }) => ({
+        steps: steps.map(({ notes, mode, modeSpecific }) => [
           notes,
           mode,
           modeSpecific,
-        })),
+        ]),
         settings,
       });
       navigator.clipboard.writeText(output);
@@ -133,7 +133,7 @@
       const input = JSON.parse(importString);
       settings = input.settings;
       steps = input.steps.map(
-        (item) => new Step(item.notes, item.mode, item.modeSpecific)
+        (item) => new Step(...item)
       );
       refreshStepState();
     } catch (err) {
