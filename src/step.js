@@ -68,6 +68,10 @@ function Step(
         break;
 
       case MODE.BOTH:
+        if (len === 1) {
+          this.index = 0;
+          break;
+        }
         this.index = this.index + this.modeSpecific.direction;
         if (this.index >= len) {
           this.modeSpecific.direction = -1;
