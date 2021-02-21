@@ -105,7 +105,7 @@
           ? steps[step.modeSpecific.mimicStep].current +
             step.modeSpecific.transpose
           : step.next();
-      if (note !== null) {
+      if (note !== null && step.mode !== MODE.MUTE) {
         midi.play(settings.base + note, speed, settings.gate);
       }
       setTimeout(tick, speed);
@@ -425,6 +425,12 @@
   .step--active .note--active {
     background: orange;
     box-shadow: 0 0 2px 1px yellow;
+  }
+  .step--mute .note--active {
+    background: #888;
+  }
+  .step--mute.step--active .note--active {
+    background: #666;
   }
   .fill-selector {
     margin-top: 16px;

@@ -7,6 +7,7 @@ export const MODE = {
   ONE: "ONE",
   MIMIC: "MIMIC",
   SKIP: "SKIP",
+  MUTE: "MUTE",
 };
 // Note lengths
 export const DIVIDENTS = [1, 2, 3, 4, 6, 8, 10, 12];
