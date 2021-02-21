@@ -16,7 +16,7 @@ function Step(
   this.current = null;
   this.queued = null;
   this.index = -1;
-  this.modeSpecific = {...modeSpecific};
+  this.modeSpecific = { ...modeSpecific };
 
   this.setMode = (newMode) => {
     if (Object.values(MODE).includes(newMode)) {
@@ -41,15 +41,15 @@ function Step(
   };
 
   this.next = () => {
+    const len = this.notes.length;
 
     if (this.queued !== null) {
-      this.index = this.queued;
+      this.index = this.queued < len ? this.queued : len - 1;
       this.current = this.notes[this.index];
       this.queued = null;
       return this.current;
     }
-  
-    const len = this.notes.length;
+
     switch (this.mode) {
       case MODE.DOWN:
         this.index = (this.index + 1 + len) % len;
