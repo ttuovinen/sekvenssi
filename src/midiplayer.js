@@ -15,9 +15,11 @@ function MidiPlayer() {
     }
 
     this.play = (note, speed, gate) => {
-        this.output.send([NOTE_ON, note, 0x7f]);
-        const length = Math.round(speed*gate/100)
-        setTimeout(() => this.keyUp(note), length);
+        if (note >= 0 && note <= 127) {
+            this.output.send([NOTE_ON, note, 0x7f]);
+            const length = Math.round(speed*gate/100)
+            setTimeout(() => this.keyUp(note), length);
+        }
     }
 }
 

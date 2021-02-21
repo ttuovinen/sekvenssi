@@ -206,8 +206,8 @@
     class="control-input"
     type="number"
     bind:value={settings.base}
-    min="24"
-    max="100"
+    min="0"
+    max="115"
   />
   {MIDI_NOTES[settings.base]}
 </label>
