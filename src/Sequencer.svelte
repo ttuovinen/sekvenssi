@@ -260,8 +260,11 @@
           {/if}
           <input
             class="note"
-            class:note--active={stepState[step.mode === MODE.MIMIC ? 0 : idx]
-              .index === nIdx}
+            class:note--active={stepState[
+              step.mode === MODE.MIMIC
+                ? stepState[idx].modeSpecific.mimicStep
+                : idx
+            ].index === nIdx}
             type="number"
             value={step.mode === MODE.MIMIC
               ? stepState[step.modeSpecific.mimicStep].notes[nIdx] +
