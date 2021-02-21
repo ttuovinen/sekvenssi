@@ -1,5 +1,11 @@
 <script>
-  import { MODE, MIDI_NOTES, DIVIDENTS, DENOMINATORS } from "./constants";
+  import {
+    MODE,
+    MIDI_NOTES,
+    DIVIDENTS,
+    DENOMINATORS,
+    SCALES,
+  } from "./constants";
   import Step from "./step";
 
   const modeOptions = Object.values(MODE);
@@ -58,7 +64,15 @@
   };
 
   const handleSetNote = (step, nIdx, note) => {
-    step.setNote(nIdx, note !== '' ? Number(note) : null);
+    step.setNote(nIdx, note !== "" ? Number(note) : null);
+  };
+
+  const handleSetNotes = (step, notes) => {
+    step.setNotes(notes);
+    // reset all fill action dropdowns
+    [...document.getElementsByClassName("fill-selector")].forEach((item) => {
+      item.selectedIndex = 0;
+    });
     refreshStepState();
   };
 
@@ -286,6 +300,19 @@
       {/each}
       {#if step.mode !== MODE.MIMIC}
         <button on:click={() => handleAddNote(step)}>+</button>
+        <!-- svelte-ignore a11y-no-onchange -->
+        <select
+          class="fill-selector"
+          value={null}
+          on:change={(e) => handleSetNotes(step, SCALES[e.target.value])}
+        >
+          <option value={null} disabled> Fill with... </option>
+          {#each Object.keys(SCALES) as scale}
+            <option value={scale}>
+              {scale}
+            </option>
+          {/each}
+        </select>
       {/if}
       <!-- Mode specific settings -->
       <!-- svelte-ignore a11y-no-onchange -->
@@ -365,7 +392,7 @@
     background: #555;
   }
   .step {
-    margin: 8px;
+    margin: 12px;
   }
   .note-wrapper {
     display: flex;
@@ -398,6 +425,14 @@
   .step--active .note--active {
     background: orange;
     box-shadow: 0 0 2px 1px yellow;
+  }
+  .fill-selector {
+    margin-top: 16px;
+    max-width: 105px;
+    background: none;
+    color: #aaa;
+    border: none;
+    border-bottom: 1px solid #666;
   }
   .mimic-settings {
     display: flex;

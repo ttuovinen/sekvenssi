@@ -31,7 +31,7 @@
   {/if}
 
   <footer class="app-footer">
-    Experimental midi sequencer prototype | Teemu T. Tuovinen 2021
+    Experimental monophonic midi sequencer | Teemu T. Tuovinen 2021
   </footer>
 </main>
 

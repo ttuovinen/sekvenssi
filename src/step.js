@@ -28,6 +28,10 @@ function Step(
     this.notes[idx] = note === "" ? null : note;
   };
 
+  this.setNotes = (newNotes = []) => {
+    this.notes = [...newNotes];
+  };
+
   this.queueNote = (idx) => {
     this.queued = idx;
   };
