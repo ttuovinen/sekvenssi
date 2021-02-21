@@ -9,8 +9,8 @@
 
   // state
   let steps = [];
-  let stepState = []; // copy parts of steps inner state for reactive UI
-  let cursor = -1;
+  let stepState = []; // copy parts of steps inner state here for reactive UI
+  let cursor = -1; // index of the current step
   let isPlaying = false;
   let noteLength = 8; // 1/noteLength
   let importString = "";
@@ -19,7 +19,7 @@
     gate: 80, // % of speed
     base: 40, // E2
     noteLength: 8,
-  }
+  };
 
   $: speed = (Math.round(60000 / settings.bpm) / noteLength) * 4;
 
@@ -62,10 +62,11 @@
   const tick = () => {
     if (isPlaying) {
       nextStep();
+      const step = steps[cursor];
       const note =
-        steps[cursor].mode === MODE.MIMIC
-          ? steps[0].current
-          : steps[cursor].next();
+        step.mode === MODE.MIMIC
+          ? steps[step.modeSpecific.mimic].current + step.modeSpecific.transpose
+          : step.next();
       if (note !== null) {
         midi.play(settings.base + note, speed, settings.gate);
       }
@@ -108,23 +109,28 @@
   };
 
   const exportAll = () => {
-    const output = JSON.stringify({
-      steps: stepState.map(({ notes, mode, nodeSpecific }) => ({
-        notes,
-        mode,
-        modeSpecific,
-      })),
-      settings,
-    });
-    navigator.clipboard.writeText(output);
+    try {
+      const output = JSON.stringify({
+        steps: stepState.map(({ notes, mode, modeSpecific }) => ({
+          notes,
+          mode,
+          modeSpecific,
+        })),
+        settings,
+      });
+      navigator.clipboard.writeText(output);
+      alert("Exported to clipboard! Paste somehere safe.");
+    } catch (err) {
+      alert("Export failed :(");
+    }
   };
 
   const importAll = () => {
     try {
       stop();
       const input = JSON.parse(importString);
-      settings =  input.settings;
-      steps = settings.steps.map(
+      settings = input.settings;
+      steps = input.steps.map(
         (item) => new Step(item.notes, item.mode, item.modeSpecific)
       );
       refreshStepState();
@@ -212,7 +218,10 @@
             class:note--active={stepState[step.mode === MODE.MIMIC ? 0 : idx]
               .index === nIdx}
             type="number"
-            value={stepState[step.mode === MODE.MIMIC ? 0 : idx].notes[nIdx]}
+            value={step.mode === MODE.MIMIC
+              ? stepState[step.modeSpecific.mimic].notes[nIdx] +
+                step.modeSpecific.transpose
+              : stepState[idx].notes[nIdx]}
             min="-24"
             max="24"
             on:change={(e) => step.setNote(nIdx, e.target.value)}
