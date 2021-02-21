@@ -106,7 +106,11 @@
 
   const exportAll = () => {
     const output = JSON.stringify({
-      steps: stepState.map(({ notes, mode }) => ({ notes, mode })),
+      steps: stepState.map(({ notes, mode }) => ({
+        notes,
+        mode,
+        modeSpecific,
+      })),
       bpm,
       gate,
     });
@@ -119,7 +123,9 @@
       const settings = JSON.parse(importString);
       bpm = settings.bpm;
       gate = settings.gate;
-      steps = settings.steps.map((item) => new Step(item.notes, item.mode));
+      steps = settings.steps.map(
+        (item) => new Step(item.notes, item.mode, item.modeSpecific)
+      );
       refreshStepState();
     } catch (err) {
       console.log(err);
@@ -216,7 +222,9 @@
           {/if}
         </div>
       {/each}
-      <button on:click={() => handleAddNote(step)}>+</button>
+      {#if step.mode !== MODE.MIMIC}
+        <button on:click={() => handleAddNote(step)}>+</button>
+      {/if}
     </div>
   {/each}
   <div class="step step--side">

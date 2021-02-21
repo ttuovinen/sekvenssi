@@ -1,21 +1,30 @@
 import { MODE } from "./constants";
 
-function Step(notes = [0], mode = MODE.DOWN) {
+const modeSpecificDefaults = {
+  direction: 1,
+  mimic: 0,
+  transpose: 0,
+};
+
+function Step(
+  notes = [0],
+  mode = MODE.DOWN,
+  modeSpecific = modeSpecificDefaults
+) {
   this.notes = notes;
   this.mode = mode;
   this.current = null;
   this.index = -1;
-  this.direction = 1;
+  this.modeSpecific = modeSpecific;
 
   this.setMode = (newMode) => {
     if (Object.values(MODE).includes(newMode)) {
       this.mode = newMode;
-
     }
   };
 
   this.setNote = (idx, note) => {
-    this.notes[idx] = note === '' ? null : parseInt(note, 10);
+    this.notes[idx] = note === "" ? null : parseInt(note, 10);
   };
 
   this.addNote = () => {
@@ -23,7 +32,7 @@ function Step(notes = [0], mode = MODE.DOWN) {
   };
 
   this.deleteNote = (delIdx) => {
-    this.notes = this.notes.filter((_, idx) => idx !== delIdx)
+    this.notes = this.notes.filter((_, idx) => idx !== delIdx);
   };
 
   this.next = () => {
@@ -43,17 +52,16 @@ function Step(notes = [0], mode = MODE.DOWN) {
         break;
 
       case MODE.BOTH:
-        this.index = this.index + this.direction;
+        this.index = this.index + this.modeSpecific.direction;
         if (this.index >= len) {
-          this.direction = -1;
-          this.index = len-2;
+          this.modeSpecific.direction = -1;
+          this.index = len - 2;
         }
         if (this.index < 0) {
-          this.direction = 1;
+          this.modeSpecific.direction = 1;
           this.index = 1;
         }
         break;
-
 
       case MODE.RANDOM:
         if (this.index < 0) {
@@ -66,17 +74,17 @@ function Step(notes = [0], mode = MODE.DOWN) {
         if (this.index < 0) {
           this.index = 0;
         } else {
-          const direction = Math.floor(Math.random()*3)-1 // -1, 0 or 1
+          const direction = Math.floor(Math.random() * 3) - 1; // -1, 0 or 1
           this.index = (this.index + direction + len) % len;
         }
         break;
 
       case MODE.ONE:
-        default:
-          if (this.index < 0) {
-            this.index = 0;
-          }
-          break;
+      default:
+        if (this.index < 0) {
+          this.index = 0;
+        }
+        break;
     }
 
     this.current = this.notes[this.index];
