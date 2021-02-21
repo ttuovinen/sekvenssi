@@ -22,8 +22,8 @@ export const MIDI_NOTES = [...new Array(128)].map((_, idx) => {
 });
 
 export const SCALES = {
-  "Minor penta": [0, 3, 5, 7, 10, 12],
   "Major penta": [0, 2, 4, 7, 9, 12],
+  "Minor penta": [0, 3, 5, 7, 10, 12],
   Major: [0, 2, 4, 5, 7, 9, 11, 12],
   "Natural minor": [0, 2, 3, 5, 7, 8, 10, 12],
   "Harmonic minor": [0, 2, 3, 5, 7, 8, 11, 12],
@@ -34,6 +34,6 @@ export const SCALES = {
   Lydian: [0, 2, 4, 6, 7, 9, 11, 12],
   Mixolydian: [0, 2, 4, 5, 7, 9, 10, 12],
   Locrian: [0, 1, 3, 5, 6, 8, 10, 12],
-  "Minor blues": [0, 3, 5, 6, 7, 10, 12],
   "Major blues": [0, 2, 3, 4, 7, 9, 12],
+  "Minor blues": [0, 3, 5, 6, 7, 10, 12],
 };
