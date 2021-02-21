@@ -8,8 +8,9 @@ export const MODE = {
   MIMIC: "MIMIC",
   SKIP: "SKIP",
 };
-
-export const NOTE_LENGTHS = [1, 2, 3, 4, 6, 8, 16, 24, 32];
+// Note lengths
+export const DIVIDENTS = [1, 2, 3, 4, 6, 8, 10, 12];
+export const DENOMINATORS = [1, 2, 4, 8, 16, 32];
 
 const NOTES = ["C", "C#", "D", "D#", "E", "F", "F#", "G", "G#", "A", "A#", "B"];
 

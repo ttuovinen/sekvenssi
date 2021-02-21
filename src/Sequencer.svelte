@@ -1,5 +1,5 @@
 <script>
-  import { MODE, NOTE_LENGTHS, MIDI_NOTES } from "./constants";
+  import { MODE, MIDI_NOTES, DIVIDENTS, DENOMINATORS } from "./constants";
   import Step from "./step";
 
   const modeOptions = Object.values(MODE);
@@ -12,16 +12,18 @@
   let stepState = []; // copy parts of steps inner state here for reactive UI
   let cursor = -1; // index of the current step
   let isPlaying = false;
-  let noteLength = 8; // 1/noteLength
   let importString = "";
   let settings = {
     bpm: 120,
     gate: 80, // % of speed
     base: 40, // E2
-    noteLength: 8,
+    divident: 1,
+    denominator: 8,
   };
 
-  $: speed = (Math.round(60000 / settings.bpm) / noteLength) * 4;
+  $: speed =
+    (Math.round(60000 / settings.bpm) * 4 * settings.divident) /
+    settings.denominator;
 
   const refreshStepState = () => {
     stepState = steps.map(({ index, notes, mode }) => ({ index, notes, mode }));
@@ -168,10 +170,18 @@
 </label>
 <label class="control-item">
   Note length:
-  <select class="control-input" bind:value={noteLength}>
-    {#each NOTE_LENGTHS as option}
+  <select class="control-input" bind:value={settings.divident}>
+    {#each DIVIDENTS as option}
       <option value={option}>
-        1 / {option}
+        {option}
+      </option>
+    {/each}
+  </select>
+  /
+  <select class="control-input" bind:value={settings.denominator}>
+    {#each DENOMINATORS as option}
+      <option value={option}>
+        {option}
       </option>
     {/each}
   </select>
