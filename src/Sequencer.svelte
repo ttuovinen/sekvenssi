@@ -12,13 +12,16 @@
   let stepState = []; // copy parts of steps inner state for reactive UI
   let cursor = -1;
   let isPlaying = false;
-  let bpm = 120; // bpm
-  let gate = 80; // % of speed
-  let base = 40; // E2
   let noteLength = 8; // 1/noteLength
   let importString = "";
+  let settings = {
+    bpm: 120,
+    gate: 80, // % of speed
+    base: 40, // E2
+    noteLength: 8,
+  }
 
-  $: speed = (Math.round(60000 / bpm) / noteLength) * 4;
+  $: speed = (Math.round(60000 / settings.bpm) / noteLength) * 4;
 
   const refreshStepState = () => {
     stepState = steps.map(({ index, notes, mode }) => ({ index, notes, mode }));
@@ -64,7 +67,7 @@
           ? steps[0].current
           : steps[cursor].next();
       if (note !== null) {
-        midi.play(base + note, speed, gate);
+        midi.play(settings.base + note, speed, settings.gate);
       }
       setTimeout(tick, speed);
       refreshStepState();
@@ -106,13 +109,12 @@
 
   const exportAll = () => {
     const output = JSON.stringify({
-      steps: stepState.map(({ notes, mode }) => ({
+      steps: stepState.map(({ notes, mode, nodeSpecific }) => ({
         notes,
         mode,
         modeSpecific,
       })),
-      bpm,
-      gate,
+      settings,
     });
     navigator.clipboard.writeText(output);
   };
@@ -120,9 +122,8 @@
   const importAll = () => {
     try {
       stop();
-      const settings = JSON.parse(importString);
-      bpm = settings.bpm;
-      gate = settings.gate;
+      const input = JSON.parse(importString);
+      settings =  input.settings;
       steps = settings.steps.map(
         (item) => new Step(item.notes, item.mode, item.modeSpecific)
       );
@@ -142,7 +143,7 @@
   <input
     class="control-input"
     type="number"
-    bind:value={bpm}
+    bind:value={settings.bpm}
     min="30"
     max="320"
   />
@@ -153,11 +154,11 @@
   <input
     class="control-input"
     type="number"
-    bind:value={base}
+    bind:value={settings.base}
     min="24"
     max="100"
   />
-  {MIDI_NOTES[base]}
+  {MIDI_NOTES[settings.base]}
 </label>
 <label class="control-item">
   Note length:
@@ -174,12 +175,11 @@
   <input
     class="control-input"
     type="range"
-    value={gate}
+    bind:value={settings.gate}
     min="1"
     max="99"
-    on:change={(e) => (gate = e.target.value)}
   />
-  {gate} %
+  {settings.gate} %
 </label>
 <button on:click={play}>PLAY</button>
 <button on:click={stop}>STOP</button>
