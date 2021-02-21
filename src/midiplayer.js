@@ -5,7 +5,7 @@ function MidiPlayer() {
     this.access = null;
     this.output = null
     this.initialize = async () => {
-        this.access = await navigator.requestMIDIAccess();
+        this.access = await navigator.requestMIDIAccess({sysex: true});
         this.output = this.access.outputs.values().next().value
         return true;
     }
