@@ -2,7 +2,7 @@ import { MODE } from "./constants";
 
 const modeSpecificDefaults = {
   direction: 1,
-  mimic: 0,
+  mimicStep: 0,
   transpose: 0,
 };
 
@@ -16,7 +16,7 @@ function Step(
   this.current = null;
   this.queued = null;
   this.index = -1;
-  this.modeSpecific = modeSpecific;
+  this.modeSpecific = {...modeSpecific};
 
   this.setMode = (newMode) => {
     if (Object.values(MODE).includes(newMode)) {
@@ -25,7 +25,7 @@ function Step(
   };
 
   this.setNote = (idx, note) => {
-    this.notes[idx] = note === "" ? null : parseInt(note, 10);
+    this.notes[idx] = note === "" ? null : note;
   };
 
   this.queueNote = (idx) => {

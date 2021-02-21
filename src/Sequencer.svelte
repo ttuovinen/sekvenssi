@@ -26,11 +26,12 @@
     settings.denominator;
 
   const refreshStepState = () => {
-    stepState = steps.map(({ index, notes, mode, queued }) => ({
+    stepState = steps.map(({ index, notes, mode, queued, modeSpecific }) => ({
       index,
       notes,
       mode,
       queued,
+      modeSpecific,
     }));
   };
 
@@ -56,6 +57,11 @@
     refreshStepState();
   };
 
+  const handleSetModeSpecific = (step, key, value) => {
+    step.modeSpecific[key] = value;
+    refreshStepState();
+  };
+
   const handleDeleteNote = (step, nIdx) => {
     step.deleteNote(nIdx);
     refreshStepState();
@@ -77,7 +83,8 @@
       const step = steps[cursor];
       const note =
         step.mode === MODE.MIMIC
-          ? steps[step.modeSpecific.mimic].current + step.modeSpecific.transpose
+          ? steps[step.modeSpecific.mimicStep].current +
+            step.modeSpecific.transpose
           : step.next();
       if (note !== null) {
         midi.play(settings.base + note, speed, settings.gate);
@@ -109,6 +116,12 @@
   };
 
   const deleteStep = (delIdx) => {
+    // update mimicSteps
+    steps.forEach((step) => {
+      if (step.modeSpecific.mimicStep > delIdx) {
+        step.modeSpecific.mimicStep -= 1;
+      }
+    });
     steps = steps.filter((_, idx) => idx !== delIdx);
     refreshStepState();
   };
@@ -131,7 +144,10 @@
         settings,
       });
       navigator.clipboard.writeText(output);
-      alert("Exported to clipboard! Paste somehere safe.");
+      setTimeout(
+        () => alert("Exported to clipboard! Paste somehere safe."),
+        100
+      );
     } catch (err) {
       alert("Export failed :(");
     }
@@ -213,14 +229,15 @@
 <div class="steps">
   {#each steps as step, idx}
     <div
-      class="step step--{stepState[idx].mode}"
+      class="step step--{stepState[idx].mode.toLowerCase()}"
       class:step--active={cursor === idx}
     >
       <button class="step-xp" on:click={() => deleteStep(idx)}>x</button>
-      <div class="step__label">{idx + 1}</div>
+      <div class="step__label">STEP {idx + 1}</div>
       <!-- svelte-ignore a11y-no-onchange -->
       <select
-        value={step.mode}
+        class="select-mode"
+        value={stepState[idx].mode}
         on:change={(e) => handleChangeMode(step, e.target.value)}
       >
         {#each modeOptions as option}
@@ -229,9 +246,11 @@
           </option>
         {/each}
       </select>
-      {#each stepState[step.mode === MODE.MIMIC ? 0 : idx].notes || [] as _, nIdx}
+
+      <!-- Notes -->
+      {#each stepState[stepState[idx].mode === MODE.MIMIC ? stepState[idx].modeSpecific.mimicStep : idx].notes || [] as _, nIdx}
         <div class="note-wrapper">
-          {#if step.mode !== MODE.MIMIC}
+          {#if stepState[idx].mode !== MODE.MIMIC}
             <button
               class="queue-note"
               class:queue-note--active={stepState[idx].queued === nIdx}
@@ -245,12 +264,12 @@
               .index === nIdx}
             type="number"
             value={step.mode === MODE.MIMIC
-              ? stepState[step.modeSpecific.mimic].notes[nIdx] +
+              ? stepState[step.modeSpecific.mimicStep].notes[nIdx] +
                 step.modeSpecific.transpose
               : stepState[idx].notes[nIdx]}
             min="-24"
             max="24"
-            on:change={(e) => step.setNote(nIdx, e.target.value)}
+            on:change={(e) => step.setNote(nIdx, Number(e.target.value))}
           />
           {#if step.mode !== MODE.MIMIC}
             <button on:click={() => handleDeleteNote(step, nIdx)}>x</button>
@@ -260,6 +279,34 @@
       {#if step.mode !== MODE.MIMIC}
         <button on:click={() => handleAddNote(step)}>+</button>
       {/if}
+      <!-- Mode specific settings -->
+      <!-- svelte-ignore a11y-no-onchange -->
+      {#if step.mode === MODE.MIMIC}
+        <div class="mimic-settings">
+          Mimic step
+          <select
+            class="select-mimic"
+            value={stepState[idx].modeSpecific.mimicStep}
+            on:change={(e) =>
+              handleSetModeSpecific(step, "mimicStep", e.target.value)}
+          >
+            {#each new Array(idx) as _, option}
+              <option value={option}>
+                {option + 1}
+              </option>
+            {/each}
+          </select>
+          Transpose
+          <input
+            type="number"
+            value={stepState[idx].modeSpecific.transpose}
+            on:change={(e) =>
+              handleSetModeSpecific(step, "transpose", Number(e.target.value))}
+            min="-24"
+            max="24"
+          />
+        </div>
+      {/if}
     </div>
   {/each}
   <div class="step step--side">
@@ -267,7 +314,7 @@
   </div>
 </div>
 
-<div>
+<div class="import-export">
   <input bind:value={importString} placeholder="paste import here..." />
   <button on:click={importAll} disabled={!importString.length}>IMPORT</button>
   <button on:click={exportAll}>EXPORT</button>
@@ -284,9 +331,11 @@
   .control-input {
     margin: 0 16px;
   }
+  .step__label {
+    margin-bottom: 8px;
+  }
   .step--active .step__label {
     color: yellow;
-    font-weight: bold;
     text-shadow: 0 0 2px 4px orange;
   }
   .steps {
@@ -313,6 +362,7 @@
   .note-wrapper {
     display: flex;
     align-items: center;
+    justify-content: center;
   }
   .queue-note {
     background: none;
@@ -324,11 +374,12 @@
   .queue-note--active {
     background: orange;
   }
+  .step--skip .select-mode,
   .step--skip .note {
     background: #333;
     color: #999;
   }
-  .step--MIMIC .note {
+  .step--mimic .note {
     opacity: 0.5;
     transform: scale(0.8);
   }
@@ -339,5 +390,16 @@
   .step--active .note--active {
     background: orange;
     box-shadow: 0 0 2px 1px yellow;
+  }
+  .mimic-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    border: 1px solid #666;
+    padding: 8px;
+    border-radius: 16px;
+  }
+  .import-export {
+    margin-top: 64px;
   }
 </style>
