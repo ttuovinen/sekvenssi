@@ -57,6 +57,11 @@
     refreshStepState();
   };
 
+  const handleSetNote = (step, nIdx, note) => {
+    step.setNote(nIdx, note !== '' ? Number(note) : null);
+    refreshStepState();
+  };
+
   const handleSetModeSpecific = (step, key, value) => {
     step.modeSpecific[key] = value;
     refreshStepState();
@@ -272,7 +277,7 @@
               : stepState[idx].notes[nIdx]}
             min="-24"
             max="24"
-            on:change={(e) => step.setNote(nIdx, Number(e.target.value))}
+            on:change={(e) => handleSetNote(step, nIdx, e.target.value)}
           />
           {#if step.mode !== MODE.MIMIC}
             <button on:click={() => handleDeleteNote(step, nIdx)}>x</button>
