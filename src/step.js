@@ -4,6 +4,7 @@ const modeSpecificDefaults = {
   direction: 1,
   mimicStep: 0,
   transpose: 0,
+  repeat: 1,
 };
 
 function Step(
@@ -16,7 +17,14 @@ function Step(
   this.current = null;
   this.queued = null;
   this.index = -1;
-  this.modeSpecific = { ...modeSpecific };
+  this.counter = 1; // for repeat
+  this.modeSpecific = { ...modeSpecificDefaults, ...modeSpecific };
+
+  this.reset = () => {
+    this.index = -1;
+    this.counter = 1;
+    this.current = null;
+  };
 
   this.setMode = (newMode) => {
     if (Object.values(MODE).includes(newMode)) {
@@ -53,6 +61,14 @@ function Step(
       this.queued = null;
       return this.current;
     }
+
+    if (this.counter < this.modeSpecific.repeat) {
+      this.counter += 1;
+      if (this.index >= 0) {
+        return this.current;
+      }
+    }
+    this.counter = 1;
 
     switch (this.mode) {
       case MODE.DOWN:

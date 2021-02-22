@@ -9,6 +9,15 @@ export const MODE = {
   SKIP: "SKIP",
   MUTE: "MUTE",
 };
+
+export const REPEAT_MODES = [
+  MODE.DOWN,
+  MODE.UP,
+  MODE.BOTH,
+  MODE.RANDOM,
+  MODE.DRUNK,
+];
+
 // Note lengths
 export const DIVIDENTS = [1, 2, 3, 4, 6, 8, 10, 12];
 export const DENOMINATORS = [1, 2, 4, 8, 16, 32];

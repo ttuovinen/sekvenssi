@@ -1,6 +1,7 @@
 <script>
   import {
     MODE,
+    REPEAT_MODES,
     MIDI_NOTES,
     DIVIDENTS,
     DENOMINATORS,
@@ -124,7 +125,9 @@
 
   const stop = () => {
     isPlaying = false;
-    steps.forEach((item) => (item.index = -1));
+    steps.forEach((item) => {
+      item.reset();
+    });
     cursor = -1;
     refreshStepState();
   };
@@ -187,16 +190,16 @@
 
   const handleKeydown = (event) => {
     // Play/pause with space bar
-    if (event.key === ' ') {
+    if (event.key === " ") {
       event.preventDefault();
       play();
     }
-  }
+  };
 
   initialize();
 </script>
 
-<svelte:window on:keydown={handleKeydown}/>
+<svelte:window on:keydown={handleKeydown} />
 
 <!-- Controls  -->
 <label class="control-item"
@@ -313,31 +316,32 @@
           {/if}
         </div>
       {/each}
-      {#if step.mode !== MODE.MIMIC}
+      {#if stepState[idx].mode !== MODE.MIMIC}
         <div class="note-add-wrapper">
           <button class="xp xp--p note-xp" on:click={() => handleAddNote(step)}
             >+</button
           >
         </div>
-        <!-- svelte-ignore a11y-no-onchange -->
-        <select
-          class="fill-selector"
-          value={null}
-          on:change={(e) => handleSetNotes(step, SCALES[e.target.value])}
-        >
-          <option value={null} disabled> Fill with... </option>
-          {#each Object.keys(SCALES) as scale}
-            <option value={scale}>
-              {scale}
-            </option>
-          {/each}
-        </select>
       {/if}
       <!-- Mode specific settings -->
       <!-- svelte-ignore a11y-no-onchange -->
-      {#if step.mode === MODE.MIMIC}
-        <div class="mimic-settings">
+      {#if REPEAT_MODES.includes(stepState[idx].mode)}
+        <div class="mode-specific-settings">
+          Repeat
+          <input
+            type="number"
+            value={stepState[idx].modeSpecific.repeat}
+            on:change={(e) =>
+              handleSetModeSpecific(step, "repeat", Number(e.target.value))}
+            min="1"
+            max="32"
+          />
+        </div>
+      {/if}
+      {#if stepState[idx].mode === MODE.MIMIC}
+        <div class="mode-specific-settings">
           Mimic step
+          <!-- svelte-ignore a11y-no-onchange -->
           <select
             class="select-mimic"
             value={stepState[idx].modeSpecific.mimicStep}
@@ -360,6 +364,21 @@
             max="24"
           />
         </div>
+      {/if}
+      {#if stepState[idx].mode !== MODE.MIMIC}
+        <!-- svelte-ignore a11y-no-onchange -->
+        <select
+          class="fill-selector"
+          value={null}
+          on:change={(e) => handleSetNotes(step, SCALES[e.target.value])}
+        >
+          <option value={null} disabled> Fill with... </option>
+          {#each Object.keys(SCALES) as scale}
+            <option value={scale}>
+              {scale}
+            </option>
+          {/each}
+        </select>
       {/if}
     </div>
   {/each}
@@ -486,13 +505,17 @@
     border-radius: 0;
     border-bottom: 1px solid #fff2;
   }
-  .mimic-settings {
+  .mode-specific-settings {
     display: flex;
     flex-direction: column;
     align-items: center;
     border: 1px solid #666;
     padding: 8px;
     border-radius: 16px;
+  }
+  .mode-specific-settings input,
+  .mode-specific-settings select {
+    margin: 8px 0;
   }
   .import-export {
     margin-top: 64px;
