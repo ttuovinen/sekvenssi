@@ -474,7 +474,8 @@
     background: none;
   }
   .step--skip .select-mode,
-  .step--skip .note {
+  .step--skip .note,
+  .step--one .note:not(.note--active) {
     background: #333;
     color: #999;
   }
