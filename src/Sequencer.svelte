@@ -22,7 +22,7 @@
   let importString = "";
   let settings = {
     bpm: 120,
-    gate: 80, // % of speed
+    gate: 60, // % of speed
     base: 40, // E2
     divident: 1,
     denominator: 8,
@@ -43,9 +43,10 @@
   };
 
   const initialize = async () => {
-    const step1 = new Step([0, 3, 7, -5, -4], MODE.BOTH);
-    const step2 = new Step([12, 10, 8], MODE.LINEAR);
-    steps = [step1, step2];
+    steps = [
+      new Step([0, 3, 7, -5, -4], MODE.BOTH),
+      new Step([12, 10, 8, 8], MODE.DOWN, { repeat: 4 }),
+    ];
     refreshStepState();
   };
 
