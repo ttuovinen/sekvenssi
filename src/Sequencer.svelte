@@ -185,8 +185,18 @@
     }
   };
 
+  const handleKeydown = (event) => {
+    // Play/pause with space bar
+    if (event.key === ' ') {
+      event.preventDefault();
+      play();
+    }
+  }
+
   initialize();
 </script>
+
+<svelte:window on:keydown={handleKeydown}/>
 
 <!-- Controls  -->
 <label class="control-item"
