@@ -212,7 +212,7 @@
   {MIDI_NOTES[settings.base]}
 </label>
 <label class="control-item">
-  Note length:
+  Note length
   <select class="control-input" bind:value={settings.divident}>
     {#each DIVIDENTS as option}
       <option value={option}>
@@ -251,7 +251,9 @@
       class="step step--{stepState[idx].mode.toLowerCase()}"
       class:step--active={cursor === idx}
     >
-      <button class="step-xp" on:click={() => deleteStep(idx)}>x</button>
+      <button class="xp xp--x step-xp" on:click={() => deleteStep(idx)}
+        >x</button
+      >
       <div class="step__label">STEP {idx + 1}</div>
       <!-- svelte-ignore a11y-no-onchange -->
       <select
@@ -294,12 +296,19 @@
             on:change={(e) => handleSetNote(step, nIdx, e.target.value)}
           />
           {#if step.mode !== MODE.MIMIC}
-            <button on:click={() => handleDeleteNote(step, nIdx)}>x</button>
+            <button
+              class="xp xp--x note-xp"
+              on:click={() => handleDeleteNote(step, nIdx)}>x</button
+            >
           {/if}
         </div>
       {/each}
       {#if step.mode !== MODE.MIMIC}
-        <button on:click={() => handleAddNote(step)}>+</button>
+        <div class="note-add-wrapper">
+          <button class="xp xp--p note-xp" on:click={() => handleAddNote(step)}
+            >+</button
+          >
+        </div>
         <!-- svelte-ignore a11y-no-onchange -->
         <select
           class="fill-selector"
@@ -345,7 +354,7 @@
     </div>
   {/each}
   <div class="step step--side">
-    <button class="step-xp" on:click={addStep}>+</button>
+    <button class="xp xp--p step-xp" on:click={addStep}>+</button>
   </div>
 </div>
 
@@ -378,18 +387,26 @@
     width: min-content;
     margin: 32px auto;
   }
-  :global(button) {
-    cursor: pointer;
+  .xp {
+    font-family: "Roboto Mono", monospace;
+    margin: 0;
+    padding: 0;
+    line-height: 0;
+    border-radius: 50%;
+  }
+  .xp--x:hover {
+    background: #f005;
+  }
+  .xp--p:hover {
+    background: #0f05;
   }
   .step-xp {
     width: 32px;
     height: 32px;
-    border-radius: 50%;
     color: white;
     background: none;
-  }
-  .step-xp:hover {
-    background: #555;
+    margin-bottom: 16px;
+    font-size: 18px;
   }
   .step {
     margin: 12px;
@@ -398,16 +415,34 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    margin-bottom: 8px;
+  }
+  .note-add-wrapper {
+    margin: 12px;
   }
   .queue-note {
     background: none;
-    width: 8px;
-    height: 8px;
+    width: 16px;
+    height: 16px;
+    border: 1px solid #888;
+    background: #fff1;
     border-radius: 50%;
-    margin-right: 6px;
+    box-shadow: 0 0 1px 4px #0003;
+    margin: 4px;
+    padding: 0;
   }
   .queue-note--active {
     background: orange;
+  }
+  .note {
+    margin: 0 6px;
+  }
+  .note-xp {
+    width: 24px;
+    height: 24px;
+    font-size: 14px;
+    color: white;
+    background: none;
   }
   .step--skip .select-mode,
   .step--skip .note {
@@ -438,7 +473,8 @@
     background: none;
     color: #aaa;
     border: none;
-    border-bottom: 1px solid #666;
+    border-radius: 0;
+    border-bottom: 1px solid #fff2;
   }
   .mimic-settings {
     display: flex;

@@ -18,7 +18,7 @@
 </script>
 
 <main>
-  <h1>SEKVENSSI!</h1>
+  <h1>SEKVENSSI</h1>
   {#if isInitialized}
     <Sequencer {midi} />
   {/if}
@@ -36,24 +36,19 @@
 </main>
 
 <style>
-  :global(body) {
-    color: #eee;
-    background: #222;
-  }
   main {
     text-align: center;
     padding: 1em;
-    max-width: 240px;
     margin: 0 auto;
   }
 
   h1 {
-    color: #ec00fb;
+    color: #7de4e4;
     text-transform: uppercase;
-    font-size: 4em;
-    font-weight: 100;
+    font-size: 3.5em;
+    letter-spacing: 0.05em;
+    font-weight: 200;
   }
-
   @media (min-width: 640px) {
     main {
       max-width: none;
