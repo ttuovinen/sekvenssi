@@ -59,6 +59,7 @@ function Step(
       this.index = this.queued < len ? this.queued : len - 1;
       this.current = this.notes[this.index];
       this.queued = null;
+      this.counter += 1;
       return this.current;
     }
 

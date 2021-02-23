@@ -46,3 +46,10 @@ export const SCALES = {
   "Major blues": [0, 2, 3, 4, 7, 9, 12],
   "Minor blues": [0, 3, 5, 6, 7, 10, 12],
 };
+
+export const ecamplePattern = [
+  [[0, 3, 7, -5, -4], "BOTH"],
+  [[12, 10, 8, 8], "DOWN", { repeat: 4 }],
+  [[0], "MIMIC", { mimicStep: 0, transpose: 12 }],
+  [[0], "MIMIC", { mimicStep: 1, transpose: -5 }],
+];

@@ -6,6 +6,7 @@
     DIVIDENTS,
     DENOMINATORS,
     SCALES,
+ecamplePattern,
   } from "./constants";
   import Step from "./step";
 
@@ -22,10 +23,10 @@
   let importString = "";
   let settings = {
     bpm: 120,
-    gate: 60, // % of speed
+    gate: 30, // % of speed
     base: 52, // E3
     divident: 1,
-    denominator: 8,
+    denominator: 16,
   };
 
   $: speed =
@@ -43,10 +44,7 @@
   };
 
   const initialize = async () => {
-    steps = [
-      new Step([0, 3, 7, -5, -4], MODE.BOTH),
-      new Step([12, 10, 8, 8], MODE.DOWN, { repeat: 4 }),
-    ];
+    steps = ecamplePattern.map(item => new Step(...item));
     refreshStepState();
   };
 
