@@ -23,7 +23,7 @@
   let settings = {
     bpm: 120,
     gate: 60, // % of speed
-    base: 40, // E2
+    base: 52, // E3
     divident: 1,
     denominator: 8,
   };
@@ -133,6 +133,14 @@
     refreshStepState();
   };
 
+  const restart = async () => {
+    steps.forEach((item) => {
+      item.reset();
+    });
+    cursor = -1;
+    refreshStepState();
+  }
+
   const addStep = () => {
     steps.push(new Step());
     refreshStepState();
@@ -195,6 +203,10 @@
       event.preventDefault();
       play();
     }
+    if (event.key === "Shift") {
+      event.preventDefault();
+      restart();
+    }
   };
 
   initialize();
@@ -256,6 +268,7 @@
 </label>
 <button on:click={play}>PLAY</button>
 <button on:click={stop}>STOP</button>
+<button on:click={restart}>RESTART</button>
 <button on:click={clearAll}>CLEAR</button>
 
 <!-- Steps  -->
@@ -347,7 +360,7 @@
             class="select-mimic"
             value={stepState[idx].modeSpecific.mimicStep}
             on:change={(e) =>
-              handleSetModeSpecific(step, "mimicStep", e.target.value)}
+              handleSetModeSpecific(step, "mimicStep", Number(e.target.value))}
           >
             {#each new Array(idx) as _, option}
               <option value={option}>
