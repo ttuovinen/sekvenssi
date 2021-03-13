@@ -6,7 +6,7 @@
     DIVIDENTS,
     DENOMINATORS,
     SCALES,
-ecamplePattern,
+    EXAMPLE_PATTERN,
   } from "./constants";
   import Step from "./step";
 
@@ -44,7 +44,7 @@ ecamplePattern,
   };
 
   const initialize = async () => {
-    steps = ecamplePattern.map(item => new Step(...item));
+    steps = EXAMPLE_PATTERN.map((item) => new Step(...item));
     refreshStepState();
   };
 
@@ -137,7 +137,7 @@ ecamplePattern,
     });
     cursor = -1;
     refreshStepState();
-  }
+  };
 
   const addStep = () => {
     steps.push(new Step());
@@ -267,7 +267,7 @@ ecamplePattern,
 <button on:click={play}>PLAY</button>
 <button on:click={stop}>STOP</button>
 <button on:click={restart}>RESTART</button>
-<button on:click={clearAll}>CLEAR</button>
+<button on:click={clearAll}>CLEAR PATTERN</button>
 
 <!-- Steps  -->
 <div class="steps">
@@ -400,6 +400,7 @@ ecamplePattern,
 </div>
 
 <div class="import-export">
+  <h2 class="sub-title">Import / export pattern</h2>
   <input bind:value={importString} placeholder="paste import here..." />
   <button on:click={importAll} disabled={!importString.length}>IMPORT</button>
   <button on:click={exportAll}>EXPORT</button>
@@ -531,6 +532,11 @@ ecamplePattern,
     margin: 8px 0;
   }
   .import-export {
-    margin-top: 64px;
+    margin-top: 92px;
+  }
+  .sub-title {
+    margin: 0 0 24px;
+    font-weight: normal;
+    font-size: 1.2rem;
   }
 </style>

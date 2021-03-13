@@ -4,11 +4,14 @@
 
   let isInitialized = false;
   let noMidiApi = false;
+  let outputs = null;
+
   const midi = new MidiPlayer();
 
   const initialize = async () => {
     try {
       isInitialized = await midi.initialize();
+      outputs = [...midi.access.outputs.values()];
     } catch (err) {
       noMidiApi = true;
     }
@@ -18,8 +21,16 @@
 </script>
 
 <main>
-  <h1>SEKVENSSI</h1>
+  <h1>SEKVENSSI²</h1>
   {#if isInitialized}
+    MIDI OUT
+    <select class="control-input" onchange={midi.changeOutput}>
+      {#each outputs as option}
+        <option value={option.value}>
+          {option.name}
+        </option>
+      {/each}
+    </select>
     <Sequencer {midi} />
   {/if}
 
@@ -31,7 +42,7 @@
   {/if}
 
   <footer class="app-footer">
-    Experimental monophonic midi sequencer | Teemu T. Tuovinen 2021
+    Experimental MIDI sequencer concept | Teemu T. Tuovinen 2021
   </footer>
 </main>
 
@@ -53,6 +64,10 @@
     main {
       max-width: none;
     }
+  }
+
+  .control-input {
+    margin: 0 16px 36px;
   }
 
   .app-footer {
