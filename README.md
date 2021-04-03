@@ -1,6 +1,8 @@
-# Sekvenssi
+# Sekvenssi²
 
 An experimental Web MIDI API sequencer.
+
+[sekvenssi.netlify.app](https://sekvenssi.netlify.app/)
 
 Made with Svelte.
 
