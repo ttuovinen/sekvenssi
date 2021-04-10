@@ -5,6 +5,7 @@ const modeSpecificDefaults = {
   mimicStep: 0,
   transpose: 0,
   repeat: 1,
+  wrap: true,
 };
 
 function Step(
@@ -111,7 +112,13 @@ function Step(
         if (this.index < 0) {
           this.index = 0;
         } else {
-          const direction = Math.floor(Math.random() * 3) - 1; // -1, 0 or 1
+          let direction = Math.floor(Math.random() * 3) - 1; // -1, 0 or 1
+          if (
+            !this.modeSpecific.wrap &&
+            (this.index + direction < 0 || this.index + direction >= len)
+          ) {
+            direction *= -1;
+          }
           this.index = (this.index + direction + len) % len;
         }
         break;

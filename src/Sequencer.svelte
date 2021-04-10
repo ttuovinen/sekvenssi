@@ -312,6 +312,8 @@
                 : idx
             ].index === nIdx}
             type="number"
+            aria-label="step {idx + 1} note {nIdx + 1}"
+            disabled={stepState[idx].mode === MODE.MIMIC}
             value={step.mode === MODE.MIMIC
               ? stepState[step.modeSpecific.mimicStep].notes[nIdx] +
                 step.modeSpecific.transpose
@@ -339,42 +341,67 @@
       <!-- svelte-ignore a11y-no-onchange -->
       {#if REPEAT_MODES.includes(stepState[idx].mode)}
         <div class="mode-specific-settings">
-          Repeat
-          <input
-            type="number"
-            value={stepState[idx].modeSpecific.repeat}
-            on:change={(e) =>
-              handleSetModeSpecific(step, "repeat", Number(e.target.value))}
-            min="1"
-            max="32"
-          />
+          <label>
+            Repeat
+            <input
+              type="number"
+              value={stepState[idx].modeSpecific.repeat}
+              on:change={(e) =>
+                handleSetModeSpecific(step, "repeat", Number(e.target.value))}
+              min="1"
+              max="32"
+            />
+          </label>
+          {#if stepState[idx].mode === MODE.DRUNK}
+            <label>
+              <input
+                type="checkbox"
+                checked={stepState[idx].modeSpecific.wrap}
+                on:change={(e) =>
+                  handleSetModeSpecific(step, "wrap", e.target.checked)}
+              />
+              Wrap
+            </label>
+          {/if}
         </div>
       {/if}
       {#if stepState[idx].mode === MODE.MIMIC}
         <div class="mode-specific-settings">
-          Mimic step
-          <!-- svelte-ignore a11y-no-onchange -->
-          <select
-            class="select-mimic"
-            value={stepState[idx].modeSpecific.mimicStep}
-            on:change={(e) =>
-              handleSetModeSpecific(step, "mimicStep", Number(e.target.value))}
-          >
-            {#each new Array(idx) as _, option}
-              <option value={option}>
-                {option + 1}
-              </option>
-            {/each}
-          </select>
-          Transpose
-          <input
-            type="number"
-            value={stepState[idx].modeSpecific.transpose}
-            on:change={(e) =>
-              handleSetModeSpecific(step, "transpose", Number(e.target.value))}
-            min="-24"
-            max="24"
-          />
+          <label>
+            Mimic step
+            <!-- svelte-ignore a11y-no-onchange -->
+            <select
+              class="select-mimic"
+              value={stepState[idx].modeSpecific.mimicStep}
+              on:change={(e) =>
+                handleSetModeSpecific(
+                  step,
+                  "mimicStep",
+                  Number(e.target.value)
+                )}
+            >
+              {#each new Array(idx) as _, option}
+                <option value={option}>
+                  {option + 1}
+                </option>
+              {/each}
+            </select>
+          </label>
+          <label>
+            Transpose
+            <input
+              type="number"
+              value={stepState[idx].modeSpecific.transpose}
+              on:change={(e) =>
+                handleSetModeSpecific(
+                  step,
+                  "transpose",
+                  Number(e.target.value)
+                )}
+              min="-24"
+              max="24"
+            />
+          </label>
         </div>
       {/if}
       {#if stepState[idx].mode !== MODE.MIMIC}
@@ -382,6 +409,7 @@
         <select
           class="fill-selector"
           value={null}
+          aria-label="Fill step with a scale"
           on:change={(e) => handleSetNotes(step, SCALES[e.target.value])}
         >
           <option value={null} disabled> Fill with... </option>
@@ -401,7 +429,11 @@
 
 <div class="import-export">
   <h2 class="sub-title">Import / export pattern</h2>
-  <input bind:value={importString} placeholder="paste import here..." />
+  <input
+    bind:value={importString}
+    aria-label="Import string"
+    placeholder="paste import here..."
+  />
   <button on:click={importAll} disabled={!importString.length}>IMPORT</button>
   <button on:click={exportAll}>EXPORT</button>
 </div>
@@ -493,12 +525,17 @@
     color: #999;
   }
   .step--mimic .note {
-    opacity: 0.5;
     transform: scale(0.8);
   }
   .note--active {
     border-color: orange;
     background: yellow;
+  }
+  .note:disabled {
+    color: black;
+  }
+  .note:disabled:not(.note--active) {
+    background: #999;
   }
   .step--active .note--active {
     background: orange;
