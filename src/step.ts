@@ -1,6 +1,6 @@
 import { MODE } from "./constants";
 
-const modeSpecificDefaults = {
+const modeSpecificDefaults: ModeSpecific = {
   direction: 1,
   mimicStep: 0,
   transpose: 0,
@@ -8,52 +8,62 @@ const modeSpecificDefaults = {
   wrap: true,
 };
 
-function Step(
-  notes = [0],
-  mode = MODE.DOWN,
-  modeSpecific = modeSpecificDefaults
-) {
-  this.notes = notes;
-  this.mode = mode;
-  this.current = null;
-  this.queued = null;
-  this.index = -1;
-  this.counter = 1; // for repeat
-  this.modeSpecific = { ...modeSpecificDefaults, ...modeSpecific };
+export class Step {
+  notes: number[];
+  mode: string;
+  current: number;
+  queued: number;
+  index: number;
+  counter: number;
+  modeSpecific: ModeSpecific;
 
-  this.reset = () => {
+  constructor(
+    notes: number[] = [0],
+    mode = MODE.DOWN,
+    modeSpecific: ModeSpecific = modeSpecificDefaults
+  ) {
+    this.notes = notes;
+    this.mode = mode;
+    this.current = null;
+    this.queued = null;
+    this.index = -1;
+    this.counter = 1; // for repeat
+    this.modeSpecific = { ...modeSpecificDefaults, ...modeSpecific };
+  }
+
+  reset = () => {
     this.index = -1;
     this.counter = 1;
     this.current = null;
   };
 
-  this.setMode = (newMode) => {
+  setMode = (newMode: string) => {
     if (Object.values(MODE).includes(newMode)) {
       this.mode = newMode;
     }
   };
 
-  this.setNote = (idx, note) => {
-    this.notes[idx] = note === "" ? null : note;
+  setNote = (idx: number, note: number) => {
+    this.notes[idx] = note;
   };
 
-  this.setNotes = (newNotes = []) => {
+  setNotes = (newNotes: number[] = []) => {
     this.notes = [...newNotes];
   };
 
-  this.queueNote = (idx) => {
+  queueNote = (idx: number) => {
     this.queued = idx;
   };
 
-  this.addNote = () => {
+  addNote = () => {
     this.notes.push(0);
   };
 
-  this.deleteNote = (delIdx) => {
-    this.notes = this.notes.filter((_, idx) => idx !== delIdx);
+  deleteNote = (delIdx: number) => {
+    this.notes = this.notes.filter((_: number, idx: number) => idx !== delIdx);
   };
 
-  this.next = () => {
+  next = () => {
     const len = this.notes.length;
 
     if (this.queued !== null) {
@@ -135,5 +145,3 @@ function Step(
     return this.current;
   };
 }
-
-export default Step;

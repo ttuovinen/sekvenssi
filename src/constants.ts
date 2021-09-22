@@ -30,7 +30,7 @@ export const MIDI_NOTES = [...new Array(128)].map((_, idx) => {
   return `${note}${octave}`;
 });
 
-export const SCALES = {
+export const SCALES: { [key: string]: number[] } = {
   "Major penta": [0, 2, 4, 7, 9, 12],
   "Minor penta": [0, 3, 5, 7, 10, 12],
   Major: [0, 2, 4, 5, 7, 9, 11, 12],
@@ -47,7 +47,7 @@ export const SCALES = {
   "Minor blues": [0, 3, 5, 6, 7, 10, 12],
 };
 
-export const EXAMPLE_PATTERN = [
+export const EXAMPLE_PATTERN: StepArray = [
   [[0, 3, 7, -5, -4], "BOTH"],
   [[12, 10, 8, 8], "DOWN", { repeat: 4 }],
   [[0], "MIMIC", { mimicStep: 0, transpose: 12 }],

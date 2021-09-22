@@ -1,17 +1,15 @@
-<script>
+<script lang="ts">
   import Sequencer from "./Sequencer.svelte";
-  import MidiPlayer from "./midiplayer";
+  import { MidiPlayer } from "./midiplayer";
 
   let isInitialized = false;
   let noMidiApi = false;
-  let outputs = null;
 
   const midi = new MidiPlayer();
 
   const initialize = async () => {
     try {
       isInitialized = await midi.initialize();
-      outputs = [...midi.access.outputs.values()];
     } catch (err) {
       noMidiApi = true;
     }
@@ -24,9 +22,10 @@
   <h1>SEKVENSSI²</h1>
   {#if isInitialized}
     MIDI OUT
-    <select class="control-input" onchange={midi.changeOutput}>
-      {#each outputs as option}
-        <option value={option.value}>
+    <!-- svelte-ignore a11y-no-onchange -->
+    <select class="control-input" on:change={midi.changeOutput}>
+      {#each midi.outputs as option, idx}
+        <option value={idx}>
           {option.name}
         </option>
       {/each}

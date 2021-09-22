@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import {
     MODE,
     REPEAT_MODES,
@@ -8,12 +8,13 @@
     SCALES,
     EXAMPLE_PATTERN,
   } from "./constants";
-  import Step from "./step";
+  import type { MidiPlayer } from "./midiplayer";
+  import { Step } from "./step";
 
   const modeOptions = Object.values(MODE);
 
   // props
-  export let midi;
+  export let midi: MidiPlayer;
 
   // state
   let steps = [];
@@ -58,41 +59,65 @@
     }
   };
 
-  const handleAddNote = (step) => {
-    step.addNote(0);
+  const handleAddNote = (step: Step) => {
+    step.addNote();
     refreshStepState();
   };
 
-  const handleSetNote = (step, nIdx, note) => {
+  const handleSetNote = (
+    evt: Event & { currentTarget: EventTarget & HTMLInputElement },
+    step: Step,
+    nIdx: number
+  ) => {
+    const note = evt.currentTarget.value;
     step.setNote(nIdx, note !== "" ? Number(note) : null);
   };
 
-  const handleSetNotes = (step, notes) => {
+  const handleSetNotes = (
+    evt: Event & { currentTarget: EventTarget & HTMLSelectElement },
+    step: Step
+  ) => {
+    const notes = SCALES[evt.currentTarget.value];
     step.setNotes(notes);
     // reset all fill action dropdowns
-    [...document.getElementsByClassName("fill-selector")].forEach((item) => {
-      item.selectedIndex = 0;
-    });
+    [...document.getElementsByClassName("fill-selector")].forEach(
+      (item: HTMLSelectElement) => {
+        item.selectedIndex = 0;
+      }
+    );
     refreshStepState();
   };
 
-  const handleSetModeSpecific = (step, key, value) => {
+  const handleSetModeSpecific = (
+    evt: Event & {
+      currentTarget: EventTarget & (HTMLInputElement | HTMLSelectElement);
+    },
+    step: { modeSpecific: ModeSpecific },
+    key: string
+  ) => {
+    const value =
+      key === "wrap"
+        ? (evt.currentTarget as HTMLInputElement).checked
+        : Number(evt.currentTarget.value);
     step.modeSpecific[key] = value;
     refreshStepState();
   };
 
-  const handleDeleteNote = (step, nIdx) => {
+  const handleDeleteNote = (step: Step, nIdx: number) => {
     step.deleteNote(nIdx);
     refreshStepState();
   };
 
-  const handleQueueNote = (step, nIdx) => {
+  const handleQueueNote = (step: Step, nIdx: number) => {
     step.queueNote(nIdx);
     refreshStepState();
   };
 
-  const handleChangeMode = (step, newMode) => {
-    step.setMode(newMode);
+  const handleChangeMode = (
+    evt: Event & { currentTarget: EventTarget & HTMLSelectElement },
+    step: Step
+  ) => {
+    step.setMode(evt.currentTarget.value);
     refreshStepState();
   };
 
@@ -144,7 +169,7 @@
     refreshStepState();
   };
 
-  const deleteStep = (delIdx) => {
+  const deleteStep = (delIdx: number) => {
     // update mimicSteps
     steps.forEach((step) => {
       if (step.modeSpecific.mimicStep > delIdx) {
@@ -187,7 +212,7 @@
       stop();
       const input = JSON.parse(importString);
       settings = input.settings;
-      steps = input.steps.map((item) => new Step(...item));
+      steps = (input.steps as StepArray).map((item) => new Step(...item));
       refreshStepState();
     } catch (err) {
       console.log(err);
@@ -195,14 +220,14 @@
     }
   };
 
-  const handleKeydown = (event) => {
+  const handleKeydown = (evt: KeyboardEvent) => {
     // Play/pause with space bar
-    if (event.key === " ") {
-      event.preventDefault();
+    if (evt.key === " ") {
+      evt.preventDefault();
       play();
     }
-    if (event.key === "Shift") {
-      event.preventDefault();
+    if (evt.key === "Shift") {
+      evt.preventDefault();
       restart();
     }
   };
@@ -284,7 +309,7 @@
       <select
         class="select-mode"
         value={stepState[idx].mode}
-        on:change={(e) => handleChangeMode(step, e.target.value)}
+        on:change={(evt) => handleChangeMode(evt, step)}
       >
         {#each modeOptions as option}
           <option value={option} disabled={idx === 0 && option === MODE.MIMIC}>
@@ -320,7 +345,7 @@
               : stepState[idx].notes[nIdx]}
             min="-24"
             max="24"
-            on:change={(e) => handleSetNote(step, nIdx, e.target.value)}
+            on:change={(evt) => handleSetNote(evt, step, nIdx)}
           />
           {#if step.mode !== MODE.MIMIC}
             <button
@@ -346,8 +371,7 @@
             <input
               type="number"
               value={stepState[idx].modeSpecific.repeat}
-              on:change={(e) =>
-                handleSetModeSpecific(step, "repeat", Number(e.target.value))}
+              on:change={(evt) => handleSetModeSpecific(evt, step, "repeat")}
               min="1"
               max="32"
             />
@@ -357,8 +381,7 @@
               <input
                 type="checkbox"
                 checked={stepState[idx].modeSpecific.wrap}
-                on:change={(e) =>
-                  handleSetModeSpecific(step, "wrap", e.target.checked)}
+                on:change={(evt) => handleSetModeSpecific(evt, step, "wrap")}
               />
               Wrap
             </label>
@@ -373,12 +396,7 @@
             <select
               class="select-mimic"
               value={stepState[idx].modeSpecific.mimicStep}
-              on:change={(e) =>
-                handleSetModeSpecific(
-                  step,
-                  "mimicStep",
-                  Number(e.target.value)
-                )}
+              on:change={(evt) => handleSetModeSpecific(evt, step, "mimicStep")}
             >
               {#each new Array(idx) as _, option}
                 <option value={option}>
@@ -392,12 +410,7 @@
             <input
               type="number"
               value={stepState[idx].modeSpecific.transpose}
-              on:change={(e) =>
-                handleSetModeSpecific(
-                  step,
-                  "transpose",
-                  Number(e.target.value)
-                )}
+              on:change={(evt) => handleSetModeSpecific(evt, step, "transpose")}
               min="-24"
               max="24"
             />
@@ -410,7 +423,7 @@
           class="fill-selector"
           value={null}
           aria-label="Fill step with a scale"
-          on:change={(e) => handleSetNotes(step, SCALES[e.target.value])}
+          on:change={(evt) => handleSetNotes(evt, step)}
         >
           <option value={null} disabled> Fill with... </option>
           {#each Object.keys(SCALES) as scale}
